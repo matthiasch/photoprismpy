@@ -15,13 +15,14 @@
 import unittest
 
 from photoprism_client.api.server_api import ServerApi
+from test import _get_api_client
 
 
 class TestServerApi(unittest.TestCase):
     """ServerApi unit test stubs"""
 
     def setUp(self) -> None:
-        self.api = ServerApi()
+        self.api = ServerApi(_get_api_client())
 
     def tearDown(self) -> None:
         pass
@@ -31,7 +32,15 @@ class TestServerApi(unittest.TestCase):
 
         reports if the server is operational
         """
-        pass
+        ret = self.api.get_status()
+        self.assertEqual(ret['status'], 'operational')
+        ret = self.api.get_status_with_http_info()
+        self.assertEqual(ret.data['status'], 'operational')
+
+        with self.assertRaises(Exception):
+            api = ServerApi(_get_api_client(host='https://does.not.exist/'))
+            _ = api.get_status()
+            _ = api.get_status_with_http_info()
 
 
 if __name__ == '__main__':
